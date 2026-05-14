@@ -1,0 +1,27 @@
+[build]
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+
+[[headers]]
+  for = "/.well-known/*"
+  [headers.values]
+    Content-Type = "application/json"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

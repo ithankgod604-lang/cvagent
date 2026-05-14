@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0F1E"/>
+      <stop offset="100%" stop-color="#0D1530"/>
+    </linearGradient>
+    <linearGradient id="doc" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1A2540"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <rect width="192" height="192" rx="42"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="192" height="192" fill="url(#bg)"/>
+    <line x1="0" y1="48.0" x2="192" y2="48.0" stroke="#ffffff" stroke-width="0.384" stroke-opacity="0.04"/>
+    <line x1="0" y1="96.0"  x2="192" y2="96.0"  stroke="#ffffff" stroke-width="0.384" stroke-opacity="0.04"/>
+    <line x1="0" y1="144.0" x2="192" y2="144.0" stroke="#ffffff" stroke-width="0.384" stroke-opacity="0.04"/>
+    <line x1="48.0" y1="0" x2="48.0" y2="192" stroke="#ffffff" stroke-width="0.384" stroke-opacity="0.04"/>
+    <line x1="96.0"  y1="0" x2="96.0"  y2="192" stroke="#ffffff" stroke-width="0.384" stroke-opacity="0.04"/>
+    <line x1="144.0" y1="0" x2="144.0" y2="192" stroke="#ffffff" stroke-width="0.384" stroke-opacity="0.04"/>
+    <circle cx="96.0" cy="96.0" r="69.12" fill="none" stroke="#00D4AA" stroke-width="0.96" stroke-opacity="0.15"/>
+    <circle cx="96.0" cy="96.0" r="57.599999999999994" fill="none" stroke="#00D4AA" stroke-width="0.48" stroke-opacity="0.10"/>
+    <rect x="55.68" y="36.48" width="65.28" height="82.56" rx="5.76" fill="url(#doc)" stroke="#00D4AA" stroke-width="1.44" stroke-opacity="0.5"/>
+    <path d="M103.67999999999999 36.48 L120.96 53.76 L103.67999999999999 53.76 Z" fill="#0A0F1E" stroke="#00D4AA" stroke-width="0.96" stroke-opacity="0.4"/>
+    <path d="M103.67999999999999 36.48 L120.96 53.76" fill="none" stroke="#00D4AA" stroke-width="1.44" stroke-opacity="0.5"/>
+    <line x1="65.28" y1="63.36" x2="105.6" y2="63.36" stroke="#00D4AA" stroke-width="1.92" stroke-opacity="0.7" stroke-linecap="round"/>
+    <line x1="65.28" y1="72.96" x2="111.36" y2="72.96" stroke="#00D4AA" stroke-width="1.44" stroke-opacity="0.4" stroke-linecap="round"/>
+    <line x1="65.28" y1="81.6" x2="99.84" y2="81.6" stroke="#00D4AA" stroke-width="1.44" stroke-opacity="0.4" stroke-linecap="round"/>
+    <line x1="65.28" y1="90.24" x2="107.52" y2="90.24" stroke="#00D4AA" stroke-width="1.44" stroke-opacity="0.35" stroke-linecap="round"/>
+    <line x1="65.28" y1="98.88" x2="94.08" y2="98.88" stroke="#00D4AA" stroke-width="1.44" stroke-opacity="0.3" stroke-linecap="round"/>
+    <circle cx="120.96" cy="103.67999999999999" r="13.44" fill="#00D4AA"/>
+    <path d="M114.24 103.67999999999999 L119.03999999999999 108.47999999999999 L127.67999999999999 99.84" fill="none" stroke="#0A0F1E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="96.0" y="145.92" font-family="Arial Black, Arial, sans-serif" font-size="30.72" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-0.96">CV</text>
+    <text x="96.0" y="167.04" font-family="Arial, sans-serif" font-size="12.48" font-weight="700" fill="#00D4AA" text-anchor="middle" letter-spacing="2.88">AGENT</text>
+  </g>
+</svg>

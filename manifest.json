@@ -1,0 +1,55 @@
+{
+  "name": "CVAgent — AI Job Application Assistant",
+  "short_name": "CVAgent",
+  "description": "AI-powered CV optimisation, interview prep, live UK jobs and career coaching for UK job seekers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0F1E",
+  "theme_color": "#00D4AA",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-72.svg",
+      "sizes": "72x72",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icon-96.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business", "education"],
+  "shortcuts": [
+    {
+      "name": "Optimise CV",
+      "short_name": "CV Tool",
+      "url": "/?page=home",
+      "description": "Optimise your CV with AI"
+    },
+    {
+      "name": "Jobs Board",
+      "short_name": "Jobs",
+      "url": "/?page=jobs",
+      "description": "Browse live UK jobs"
+    },
+    {
+      "name": "Mock Interview",
+      "short_name": "Interview",
+      "url": "/?page=mock",
+      "description": "Practice your interview"
+    }
+  ]
+}
