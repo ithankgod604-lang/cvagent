@@ -4107,7 +4107,7 @@ function scrollToEl(id) { document.getElementById(id)?.scrollIntoView({ behavior
 async function callAPI(system, messages, useWebSearch) {
   
   var body = {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-5',
     max_tokens: 4000,
     system: system,
     messages: messages
@@ -4513,7 +4513,7 @@ function onLoginSuccess() {
 // MODEL SELECTOR
 // ═══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', function() {
-  // Model hardcoded to claude-sonnet-4-20250514
+  // Model hardcoded to claude-sonnet-4-5
   updateNavAuth();
   var user = getCurrentUser();
   if (user) {
