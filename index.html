@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4072,8 +4071,8 @@ Rules:
 - Sort by matchScore descending`;
 
 const MODELS = [
- { id: 'claude-sonnet-4-5', label: 'Sonnet 4.5 — Best quality' },
-{ id: 'claude-haiku-4-5', label: 'Haiku 4.5 — Faster & saves quota' },
+  { id: 'claude-sonnet-4-5', label: 'Sonnet 4.5 — Best quality' },
+  { id: 'claude-haiku-4-5-20251001', label: 'Haiku 4.5 — Faster & saves quota' },
 ];
 
 function getModel() { return localStorage.getItem('cvagent_model') || MODELS[0].id; }
@@ -4105,7 +4104,7 @@ function showError(msg, data) {
 function scrollToEl(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }
 
 async function callAPI(system, messages, useWebSearch) {
-  
+  // All API calls go through Netlify function — key is secure on server
   var body = {
     model: 'claude-sonnet-4-5',
     max_tokens: 4000,
@@ -4116,10 +4115,7 @@ async function callAPI(system, messages, useWebSearch) {
 
   const res = await fetch('/.netlify/functions/claude', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
 
@@ -4628,6 +4624,40 @@ function getCurrentUser() { return JSON.parse(localStorage.getItem(AUTH_KEY) || 
 function setCurrentUser(user) { localStorage.setItem(AUTH_KEY, JSON.stringify(user)); }
 function clearCurrentUser() { localStorage.removeItem(AUTH_KEY); }
 
+// ═══════════════════════════════════════════════
+// SUPABASE API
+// ═══════════════════════════════════════════════
+async function supabaseCall(action, data) {
+  try {
+    const res = await fetch('/.netlify/functions/supabase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, data })
+    });
+    return await res.json();
+  } catch(e) {
+    console.warn('Supabase call failed:', e);
+    return { error: e.message };
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SUPABASE API
+// ═══════════════════════════════════════════════
+async function supabaseCall(action, data) {
+  try {
+    const res = await fetch('/.netlify/functions/supabase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, data })
+    });
+    return await res.json();
+  } catch(e) {
+    console.warn('Supabase call failed:', e);
+    return { error: e.message };
+  }
+}
+
 function updateNavAuth() {
   // Sync sidebar user card
   if (typeof updateSidebarUser === 'function') updateSidebarUser();
@@ -4703,19 +4733,26 @@ function checkStrength(pwd) {
   label.style.color = l.bg === 'transparent' ? 'var(--muted)' : l.bg;
 }
 
-function handleLogin() {
+async function handleLogin() {
   var email = document.getElementById('loginEmail').value.trim().toLowerCase();
   var password = document.getElementById('loginPassword').value;
   clearAuthMsgs();
   if (!email || !password) { showAuthMsg('Please enter your email and password.',''); return; }
-  var users = getUsers();
-  var user = users.find(function(u){return u.email===email;});
-  if (!user) { showAuthMsg('No account found with that email. Please register first.',''); return; }
-  if (user.password !== btoa(password)) { showAuthMsg('Incorrect password. Please try again.',''); return; }
-  setCurrentUser(user); onLoginSuccess();
+  showAuthMsg('', 'Signing in...');
+  var result = await supabaseCall('login', { email: email, password: password });
+  if (result.error) {
+    // Fallback to localStorage for existing users
+    var users = getUsers();
+    var user = users.find(function(u){return u.email===email;});
+    if (user && user.password === btoa(password)) {
+      setCurrentUser(user); onLoginSuccess(); return;
+    }
+    showAuthMsg(result.error || 'Login failed. Please try again.',''); return;
+  }
+  setCurrentUser(result.user); onLoginSuccess();
 }
 
-function handleRegister() {
+async function handleRegister() {
   var first = document.getElementById('regFirst').value.trim();
   var last = document.getElementById('regLast').value.trim();
   var email = document.getElementById('regEmail').value.trim().toLowerCase();
@@ -4729,10 +4766,19 @@ function handleRegister() {
   if (password.length < 8) { showAuthMsg('Password must be at least 8 characters.',''); return; }
   if (password !== confirm) { showAuthMsg('Passwords do not match.',''); return; }
   if (!agreed) { showAuthMsg('Please agree to the Terms of Service.',''); return; }
-  var users = getUsers();
-  if (users.find(function(u){return u.email===email;})) { showAuthMsg('An account with this email already exists.',''); return; }
-  var newUser = { id: Date.now().toString(), firstName:first, lastName:last, email:email, password:btoa(password), sector:sector, plan:'free', createdAt: new Date().toISOString() };
-  users.push(newUser); saveUsers(users); setCurrentUser(newUser);
+  showAuthMsg('', 'Creating your account...');
+  var result = await supabaseCall('register', { email: email, password: password, firstName: first, lastName: last, sector: sector });
+  if (result.error) {
+    // Fallback to localStorage if Supabase fails
+    var users = getUsers();
+    if (users.find(function(u){return u.email===email;})) { showAuthMsg('An account with this email already exists.',''); return; }
+    var newUser = { id: Date.now().toString(), firstName:first, lastName:last, email:email, password:btoa(password), sector:sector, plan:'free', createdAt: new Date().toISOString() };
+    users.push(newUser); saveUsers(users); setCurrentUser(newUser);
+    showAuthMsg('', 'Welcome to CVAgent, ' + first + '! Account created.');
+    setTimeout(function(){ onLoginSuccess(); }, 1200);
+    return;
+  }
+  setCurrentUser(result.user);
   showAuthMsg('', 'Welcome to CVAgent, ' + first + '! Account created.');
   setTimeout(function(){ onLoginSuccess(); }, 1200);
 }
