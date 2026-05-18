@@ -4511,12 +4511,42 @@ function onLoginSuccess() {
 window.addEventListener('DOMContentLoaded', function() {
   // Model hardcoded to claude-sonnet-4-5
   updateNavAuth();
+
+  // ── Handle Google OAuth callback ──
+  // Supabase redirects back with #access_token=xxx in the URL hash
+  var hash = window.location.hash;
+  if (hash && hash.indexOf('access_token') >= 0) {
+    // Parse the hash params
+    var params = {};
+    hash.substring(1).split('&').forEach(function(pair) {
+      var parts = pair.split('=');
+      params[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1] || '');
+    });
+    if (params.access_token) {
+      // Exchange token for user info via Supabase
+      supabaseCall('googleCallback', { token: params.access_token })
+      .then(function(result) {
+        if (result && result.user) {
+          setCurrentUser(result.user);
+          window.history.replaceState({}, document.title, window.location.pathname);
+          updateNavAuth();
+          showApp('home');
+        } else {
+          console.warn('OAuth callback failed:', result);
+          showLanding();
+        }
+      }).catch(function(e) {
+        console.warn('OAuth callback error:', e);
+        showLanding();
+      });
+      return; // Wait for fetch to complete
+    }
+  }
+
   var user = getCurrentUser();
   if (user) {
-    // Already logged in — go straight to home
     showApp('home');
   } else {
-    // Not logged in — show landing page
     showLanding();
   }
   initGoogleSignIn();
