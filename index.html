@@ -15,6 +15,7 @@
   <meta name="msapplication-TileImage" content="icon-144.svg" />
   <meta name="msapplication-TileColor" content="#0A0F1E" />
   <!-- Google Sign-In SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -2490,8 +2491,7 @@
           </div>
           <button class="auth-btn" onclick="handleLogin()">🔐 Sign In</button>
           <div class="google-divider">or continue with</div>
-          <button class="google-btn" onclick=" triggerGoogleSignIn()"> continue with google</button> 
-  
+          <button class="google-btn" onclick="triggerGoogleSignIn('login')">
             <svg class="google-btn-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -3960,7 +3960,7 @@
       <p style="margin-bottom:16px">CVAgent ("we", "our", "us") is committed to protecting your privacy. This policy explains what information we collect, how we use it, and your rights.</p>
 
       <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff;margin:24px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)">1. Information We Collect</div>
-      <p style="margin-bottom:12px"><strong style="color:#fff">Account Information:</strong> When you register, we collect your first name, last name, email address, target job sector and location. Your account information is stored securely in our database hosted on Supabase (EU-West, Ireland).</p>
+      <p style="margin-bottom:12px"><strong style="color:#fff">Account Information:</strong> When you register, we collect your first name, last name, email address, target job sector and location. This is stored in your browser's local storage on your device.</p>
       <p style="margin-bottom:12px"><strong style="color:#fff">CV and Job Data:</strong> When you use the CV optimiser, your CV text and job description are sent to Anthropic's API (Claude AI) for processing. This data is transmitted securely over HTTPS and is not stored on our servers.</p>
       <p style="margin-bottom:12px"><strong style="color:#fff">Usage Data:</strong> We store your application tracker entries, job alerts, achievements, and settings locally on your device using browser localStorage. This data never leaves your device unless you explicitly export it.</p>
       <p style="margin-bottom:20px"><strong style="color:#fff">Jobs Data:</strong> When you browse the jobs board, queries are sent to the Adzuna API to fetch live job listings. No personal data is sent with these requests.</p>
@@ -3979,8 +3979,7 @@
       <p style="margin-bottom:20px"><strong style="color:#fff">Google Sign-In:</strong> If you choose to sign in with Google, Google's authentication service processes your login. See <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--accent)">policies.google.com/privacy</a>.</p>
 
       <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff;margin:24px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)">4. Data Storage & Security</div>
-      <p style="margin-bottom:12px">Your account information (name and email) is stored securely in our database hosted on Supabase (EU-West, Ireland). Your CV data sent to Anthropic for AI processing is not stored on our servers. You can request deletion at any time via Settings → Delete Account.
-</p>
+      <p style="margin-bottom:12px">All personal data (account details, CV history, applications, achievements) is stored locally on your device using browser localStorage. We do not operate a central database or server that stores your personal information.</p>
       <p style="margin-bottom:20px">Data sent to third-party APIs (Anthropic, Adzuna) is transmitted over encrypted HTTPS connections. We do not sell, rent, or share your personal data with any third parties for marketing purposes.</p>
 
       <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff;margin:24px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)">5. Your Rights (UK GDPR)</div>
@@ -4009,7 +4008,7 @@
           <strong style="color:#fff">CVAgent</strong><br>
           Developer: Ifeanyi Aghanama<br>
           App: <a href="https://cvagentuk.co.uk" style="color:var(--accent)">cvagentuk.co.uk</a><br>
-          For data requests, email the developer via hello@cvagentuk.co.uk
+          For data requests, email the developer via the app's Settings page.
         </div>
       </div>
     </div>
@@ -4628,21 +4627,6 @@ function clearCurrentUser() { localStorage.removeItem(AUTH_KEY); }
 // ═══════════════════════════════════════════════
 // SUPABASE API
 // ═══════════════════════════════════════════════
-async function supabaseCall(action, data) {
-  try {
-    const res = await fetch('/.netlify/functions/supabase', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, data })
-    });
-    return await res.json();
-  } catch(e) {
-    console.warn('Supabase call failed:', e);
-    return { error: e.message };
-  }
-}
-
-// ═══════════════════════════════════════════════
 // SUPABASE API
 // ═══════════════════════════════════════════════
 async function supabaseCall(action, data) {
@@ -4825,30 +4809,19 @@ function initGoogleSignIn() {
   }
 }
 
-function triggerGoogleSignIn(context) {
+async function triggerGoogleSignIn(context) {
   clearAuthMsgs();
-  if (GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID') >= 0) {
-    showGoogleSetupInfo(); return;
-  }
-  if (typeof google === 'undefined' || !google.accounts || !window._googleReady) {
-    showAuthMsg('Google Sign-In is still loading. Please try again in a moment.', ''); return;
-  }
-  // Use One Tap / popup flow
-  google.accounts.id.prompt(function(notification) {
-    if (notification.isNotDisplayed()) {
-      // Fallback: render button and click it
-      var container = document.getElementById(context === 'login' ? 'googleBtnLogin' : 'googleBtnRegister');
-      if (container) {
-        container.style.display = 'block';
-        google.accounts.id.renderButton(container, {
-          theme: 'filled_black', size: 'large',
-          width: container.offsetWidth || 360,
-          text: context === 'login' ? 'signin_with' : 'signup_with',
-          shape: 'rectangular'
-        });
-      }
+  showAuthMsg('', 'Redirecting to Google...');
+  try {
+    var result = await supabaseCall('googleLogin', { redirectTo: 'https://cvagentuk.co.uk' });
+    if (result && result.url) {
+      window.location.href = result.url;
+    } else {
+      showAuthMsg('Google login failed. Please use email login instead.', '');
     }
-  });
+  } catch(e) {
+    showAuthMsg('Google login failed. Please use email login instead.', '');
+  }
 }
 
 function showGoogleFallbackButtons() {
@@ -7418,9 +7391,7 @@ document.addEventListener('keydown', function(e) {
     if (startX > 0 && startX < 280 && startX - endX > 60) closeSidebar(); /* swipe left — close */
   }, { passive: true });
 })();
-async function triggerGoogleSignIn() {
-  window.location.href = 'https://jnykjpxshsvqjxuykojz.supabase.co/auth/v1/authorize?provider=google&redirect_to=https://cvagentuk.co.uk';
-}
+
 </script>
 </body>
 </html>
