@@ -4021,36 +4021,25 @@
 // ═══════════════════════════════════════════════
 // CORE CONFIG & MODEL SELECTOR
 // ═══════════════════════════════════════════════
-const CV_SYSTEM = `You are an elite UK CV optimisation expert and ATS specialist.
+const CV_SYSTEM = `You are a UK CV optimisation expert. Analyse the job description and CV, respond with ONLY a raw JSON object.
 
-Analyse the job description and candidate CV provided, then respond with ONLY a raw JSON object. No markdown, no code fences, no explanation. Your entire response must be the JSON and nothing else.
-
-Required JSON structure:
 {
   "scores": { "overall": 0, "skills": 0, "keywords": 0, "experience": 0 },
   "missing": { "ats": [], "technical": [], "behavioural": [], "suggested": [] },
-  "summary": "",
-  "experience": "",
+  "summary": "3-4 line optimised professional summary",
+  "experience": "rewritten experience section with UK action verbs and ATS keywords",
   "skills": { "technical": [], "software": [], "soft": [], "industry": [] },
-  "analysis": "",
-  "cover": "",
-  "fullCV": "",
-  "jobSearchQuery": "",
-  "jobTitles": []
+  "analysis": "brief analysis of improvements",
+  "cover": "cover letter if requested else empty string",
+  "jobSearchQuery": "3-5 word UK job search query",
+  "jobTitles": ["title1","title2","title3"]
 }
 
-Field instructions:
-- scores: integers 0-100
-- summary: 3-5 line optimised professional summary tailored to the specific role
-- experience: all work experience rewritten with UK action verbs and ATS keywords. Keep all dates, employers, titles truthful.
-- analysis: why the CV is now stronger, which keywords improved ranking, what may still need work
-- cover: full tailored UK cover letter if requested, otherwise empty string
-- fullCV: a structured JSON object representing a fully formatted UK CV. Follow this exact structure:
-  {"name":"","targetRole":"","phone":"","email":"","location":"","linkedin":"","summary":"","coreSkills":[],"experience":[{"title":"","employer":"","location":"","startDate":"","endDate":"","bullets":[]}],"education":[{"qualification":"","institution":"","dates":"","grade":""}],"training":[],"references":"Available upon request"}
-- jobSearchQuery: 3-6 word UK job board search query
-- jobTitles: array of 3 exact job titles this candidate should target
+Rules: Never fabricate. UK English. Scores 0-100. Return ONLY the JSON.`
 
-RULES: Never fabricate. UK English only. Return ONLY the JSON object.`;
+const CV_FULL_SYSTEM = `You are a UK CV writer. Given a job description and CV, produce ONLY a JSON object for a formatted UK CV:
+{"name":"","targetRole":"","phone":"","email":"","location":"","linkedin":"","summary":"","coreSkills":[],"experience":[{"title":"","employer":"","location":"","startDate":"","endDate":"","bullets":[]}],"education":[{"qualification":"","institution":"","dates":"","grade":""}],"training":[],"references":"Available upon request"}
+Keep all details truthful. Return ONLY the JSON object.`;
 
 const JOBS_SYSTEM = `You are a UK job search agent. Search for real live job listings that match the candidate profile.
 
@@ -4313,6 +4302,14 @@ async function runAgent() {
     var raw = await callAPI(CV_SYSTEM, [{ role: 'user', content: userMsg }], false);
     var result = extractJSON(raw);
     if (!result) { showError('Could not parse response. First 300 chars: ' + raw.slice(0,300), null); btn.disabled=false; setStatus(''); return; }
+    // Call 2: Generate full formatted CV separately
+    try {
+      setStatus('Generating your formatted CV...');
+      var cvRaw = await callAPI(CV_FULL_SYSTEM, [{ role: 'user', content: 'JOB DESCRIPTION:\n' + jd + '\n\nCANDIDATE CV:\n' + cv + '\n\nReturn ONLY the JSON object.' }], false);
+      var cvResult = null;
+      try { var s=cvRaw.indexOf('{'),e=cvRaw.lastIndexOf('}'); if(s>=0&&e>s) cvResult=JSON.parse(cvRaw.slice(s,e+1)); } catch(ex){}
+      if (cvResult) result.fullCV = cvResult;
+    } catch(cvErr) { console.warn('Full CV generation failed:', cvErr); }
     document.getElementById('scoresGrid').innerHTML = renderScores(result.scores || {});
     document.getElementById('missingContent').innerHTML = renderMissing(result.missing);
     document.getElementById('summaryText').textContent = result.summary || '';
