@@ -5,6 +5,9 @@
   NODE_VERSION = "18"
   SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL"
 
+[functions]
+  timeout = 30
+
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
 
