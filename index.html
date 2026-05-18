@@ -4794,10 +4794,8 @@ function initGoogleSignIn() {
 }
 
 function triggerGoogleSignIn(context) {
-  // Direct Supabase OAuth redirect — no intermediate function needed
-  var SUPABASE_URL = 'https://jnykjpxshsvqjxuykojz.supabase.co';
-  var redirectTo = encodeURIComponent('https://cvagentuk.co.uk');
-  window.location.href = SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + redirectTo;
+  // Direct Supabase OAuth redirect
+  window.location.href = 'https://jnykjpxshsvqjxuykojz.supabase.co/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent('https://cvagentuk.co.uk');
 }
 
 function showGoogleFallbackButtons() {
