@@ -26,15 +26,10 @@ exports.handler = async function(event, context) {
   try {
     const body = JSON.parse(event.body);
 
-    // Split large requests into two separate calls:
-    // Call 1: scores, missing, summary, experience, skills, analysis (fast)
-    // Call 2: fullCV, cover letter (separate if needed)
-    // This keeps each call under 10 seconds
-
     const requestBody = {
       ...body,
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: Math.min(body.max_tokens || 2000, 2500),
+      max_tokens: body.max_tokens || 4000,
     };
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
