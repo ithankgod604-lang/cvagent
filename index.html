@@ -4788,40 +4788,16 @@ function socialLogin(provider) {
 var GOOGLE_CLIENT_ID = '343768110225-9jj6mlbuj5n8v6pn17sc3rem5sibqhne.apps.googleusercontent.com';
 
 function initGoogleSignIn() {
-  if (GOOGLE_CLIENT_ID.indexOf('YOUR_GOOGLE_CLIENT_ID') >= 0) {
-    // No real client ID — buttons already shown as custom HTML, just wire them
-    return;
-  }
-  if (typeof google === 'undefined' || !google.accounts) {
-    setTimeout(initGoogleSignIn, 600);
-    return;
-  }
-  try {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      auto_select: false,
-    });
-    // GSI is ready — custom buttons will call prompt() directly
-    window._googleReady = true;
-  } catch(e) {
-    console.warn('Google Sign-In init failed:', e);
-  }
+  // Google buttons now use direct Supabase OAuth redirect
+  // No GSI library needed
+  window._googleReady = true;
 }
 
-async function triggerGoogleSignIn(context) {
-  clearAuthMsgs();
-  showAuthMsg('', 'Redirecting to Google...');
-  try {
-    var result = await supabaseCall('googleLogin', { redirectTo: 'https://cvagentuk.co.uk' });
-    if (result && result.url) {
-      window.location.href = result.url;
-    } else {
-      showAuthMsg('Google login failed. Please use email login instead.', '');
-    }
-  } catch(e) {
-    showAuthMsg('Google login failed. Please use email login instead.', '');
-  }
+function triggerGoogleSignIn(context) {
+  // Direct Supabase OAuth redirect — no intermediate function needed
+  var SUPABASE_URL = 'https://jnykjpxshsvqjxuykojz.supabase.co';
+  var redirectTo = encodeURIComponent('https://cvagentuk.co.uk');
+  window.location.href = SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + redirectTo;
 }
 
 function showGoogleFallbackButtons() {
