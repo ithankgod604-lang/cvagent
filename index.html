@@ -4021,25 +4021,39 @@
 // ═══════════════════════════════════════════════
 // CORE CONFIG & MODEL SELECTOR
 // ═══════════════════════════════════════════════
-const CV_SYSTEM = `You are a UK CV optimisation expert. Analyse the job description and CV, respond with ONLY a raw JSON object.
+const CV_SYSTEM = `You are a UK CV optimisation expert. Your job is to REWORD and REFRAME the candidate's REAL experience — never invent skills, roles or achievements they do not have.
 
+CRITICAL RULES:
+1. NEVER fabricate experience, skills, qualifications, achievements or metrics the candidate does not have
+2. ONLY reword existing experience using stronger UK action verbs and ATS keywords
+3. If a keyword from the job description is NOT in the candidate's real background — list it in "missing" but do NOT add it to the CV
+4. "missing" should ONLY contain keywords genuinely absent from the candidate's background — do not repeat keywords already present
+5. The "experience" field rewrites existing jobs using better language — same facts, better words
+6. Scores must reflect reality — if the candidate genuinely lacks 40% of required skills, overall score should reflect that honestly
+
+Respond with ONLY a raw JSON object:
 {
   "scores": { "overall": 0, "skills": 0, "keywords": 0, "experience": 0 },
   "missing": { "ats": [], "technical": [], "behavioural": [], "suggested": [] },
-  "summary": "3-4 line optimised professional summary",
-  "experience": "rewritten experience section with UK action verbs and ATS keywords",
+  "summary": "3-4 line summary using ONLY real experience from their CV",
+  "experience": "existing jobs reworded with stronger UK action verbs — same facts better language",
   "skills": { "technical": [], "software": [], "soft": [], "industry": [] },
-  "analysis": "brief analysis of improvements",
-  "cover": "cover letter if requested else empty string",
+  "analysis": "honest gap analysis — what they have, what they genuinely lack, what to develop",
+  "cover": "cover letter based only on real experience if requested, else empty string",
   "jobSearchQuery": "3-5 word UK job search query",
   "jobTitles": ["title1","title2","title3"]
 }
 
-Rules: Never fabricate. UK English. Scores 0-100. Return ONLY the JSON.`
+UK English only. Scores 0-100. Return ONLY the JSON.`
 
-const CV_FULL_SYSTEM = `You are a UK CV writer. Given a job description and CV, produce ONLY a JSON object for a formatted UK CV:
+const CV_FULL_SYSTEM = `You are a UK CV writer. Format the candidate's REAL experience into a clean UK CV structure.
+
+CRITICAL: Use ONLY information from the candidate's actual CV. Do not invent employers, dates, qualifications, skills or achievements. If information is missing (e.g. phone number), leave it blank — do not guess.
+
+Return ONLY this JSON structure:
 {"name":"","targetRole":"","phone":"","email":"","location":"","linkedin":"","summary":"","coreSkills":[],"experience":[{"title":"","employer":"","location":"","startDate":"","endDate":"","bullets":[]}],"education":[{"qualification":"","institution":"","dates":"","grade":""}],"training":[],"references":"Available upon request"}
-Keep all details truthful. Return ONLY the JSON object.`;
+
+Bullets should reword real achievements with stronger UK action verbs — same facts, better language. Return ONLY the JSON.`;
 
 const JOBS_SYSTEM = `You are a UK job search agent. Search for real live job listings that match the candidate profile.
 
